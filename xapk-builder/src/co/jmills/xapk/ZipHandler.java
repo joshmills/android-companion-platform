@@ -4,28 +4,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 
  * @author Josh Mills
  */
 public class ZipHandler {
- 
-	private String mInputZipFile;
-	private String mOutputFolder;
-	
-	public ZipHandler(String inputZipFile, String outputZipFile) {
-		this.mInputZipFile = inputZipFile;
-		this.mOutputFolder = outputZipFile;
-	}
-	
-	public void unZip() {
-		unZip(mInputZipFile, mOutputFolder);
-	}
-	
-	private void unZip(String inputZipFile, String outputFolder) {
+
+	/**
+	 * Unzip the contents of the input file, to the output directory.
+	 * @param inputZipFile
+	 * @param outputFolder
+	 */
+	public static void unZip(String inputZipFile, String outputFolder) {
 		byte[] buffer = new byte[1024];
 		
 		try {
@@ -65,5 +61,73 @@ public class ZipHandler {
 		} catch (IOException ex) {
 			System.err.println(ex.getMessage());
 		}
+	}
+	
+	/**
+	 * Zip the files in the input directory to a .obb file.
+	 * @param inputFolder
+	 */
+	public static void zip(String inputFolder) {
+		byte[] buffer = new byte[1024];
+				
+		List<String> fileList = generateFileList(inputFolder, new File(inputFolder));
+		String outputDirectory = inputFolder + ".obb";
+		
+		try {
+			
+			FileOutputStream fileOutputStream = new FileOutputStream(outputDirectory);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+			
+			System.out.println("Output to Zip : " + outputDirectory);
+			
+			for (String file : fileList) {
+				
+				System.out.println("File added : " + file);
+				
+				ZipEntry zipEntry = new ZipEntry(file);
+				zipOutputStream.putNextEntry(zipEntry);
+				
+				FileInputStream fileInputStream = new FileInputStream(inputFolder + File.separator + file);
+				
+				int len;
+				while ((len = fileInputStream.read(buffer)) > 0) {
+					zipOutputStream.write(buffer, 0, len);
+				}
+				
+				fileInputStream.close();
+			}
+			
+			zipOutputStream.closeEntry();
+			zipOutputStream.close();
+			
+			System.out.println("Done");
+			
+		} catch (IOException ex) {
+			System.err.println(ex.getMessage());
+		}
+	}
+
+	private static List<String> generateFileList(String sourceFolder, File file) {
+		
+		List<String> fileList = new ArrayList<>();
+		
+		if (file.isFile()) {
+			if (file.getName().compareTo(".DS_Store") != 0) {
+				fileList.add(generateZipEntry(sourceFolder, file.getAbsoluteFile().toString()));	
+			}
+		}
+		
+		if (file.isDirectory()) {
+			String[] subFiles = file.list();
+			for (String fileName : subFiles) {
+				fileList.addAll(generateFileList(sourceFolder, new File(file, fileName)));
+			}
+		}
+		
+		return fileList;
+	}
+	
+	private static String generateZipEntry(String sourceFolder, String file) {
+		return file.substring(sourceFolder.length() + 1, file.length());
 	}
 }

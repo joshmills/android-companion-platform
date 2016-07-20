@@ -45,8 +45,27 @@ public class Main {
 							System.out.println("Output file: " + outputFilePath + ".");
 							
 							// Unzip the file
-							ZipHandler zipHandler = new ZipHandler(inputFilePath, outputFilePath);
-							zipHandler.unZip();
+							ZipHandler.unZip(inputFilePath, outputFilePath);
+							
+						} catch (IOException e) {
+							System.err.println("No file chosen.");
+						}
+					}
+
+					@Override
+					public void saveXAPK(JFrame parent) {
+						
+						System.out.println("Save XAPK");
+						final JFileChooser fc = new JFileChooser();
+						
+						try {
+							
+							// Select the file input
+							String inputFilePath = handleFileInput(fc, parent, true);
+							System.out.println("Input file: " + inputFilePath + ".");
+							
+							// Handle the xapk compression
+							ZipHandler.zip(inputFilePath);
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");
