@@ -53,7 +53,7 @@ public class Main {
 					}
 
 					@Override
-					public void saveXAPK(JFrame parent) {
+					public void saveXAPK(JFrame parent, String packageName, int versionCode) {
 						
 						System.out.println("Save XAPK");
 						final JFileChooser fc = new JFileChooser();
@@ -65,7 +65,7 @@ public class Main {
 							System.out.println("Input file: " + inputFilePath + ".");
 							
 							// Handle the xapk compression
-							ZipHandler.zip(inputFilePath);
+							ZipHandler.zip(inputFilePath, packageName, versionCode);
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");

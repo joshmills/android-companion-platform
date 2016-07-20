@@ -4,10 +4,13 @@ import javax.swing.JFrame;
 
 import co.jmills.xapk.Strings;
 import javax.swing.JButton;
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
+import javax.swing.JTextField;
+import javax.swing.JPanel;
+import java.awt.Component;
+import java.awt.FlowLayout;
 
 /**
  * 
@@ -20,11 +23,15 @@ public class MainWindow implements ActionListener {
 	private JButton mBtnOpenXAPK;
 	private JButton mBtnSaveXAPK;
 	
+	private JTextField mTxtPackageName;
+	private JTextField mTxtVersioncode;
+	private JPanel panel;
+	
 	// Callbacks
 	private MainWindowListener mListener;
 	public interface MainWindowListener {
 		void openXAPK(JFrame parent);
-		void saveXAPK(JFrame parent);
+		void saveXAPK(JFrame parent, String packageName, int versionCode);
 	}
 	
 	/**
@@ -57,12 +64,37 @@ public class MainWindow implements ActionListener {
 		mBtnSaveXAPK = new JButton("Save XAPK");
 		mFrame.getContentPane().add(mBtnSaveXAPK);
 		mBtnSaveXAPK.addActionListener(this);
+		
+		panel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mFrame.getContentPane().add(panel);
+		
+		mTxtPackageName = new JTextField();
+		mTxtPackageName.setText("com.example.package");
+		panel.add(mTxtPackageName);
+		mTxtPackageName.setColumns(20);
+		
+		mTxtVersioncode = new JTextField();
+		panel.add(mTxtVersioncode);
+		mTxtVersioncode.setText("0");
+		mTxtVersioncode.setColumns(10);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == mBtnSaveXAPK) {
-			mListener.saveXAPK(mFrame);
+			
+			int versionCode;
+			try {
+				
+				versionCode = Integer.parseInt(mTxtVersioncode.getText());
+				mListener.saveXAPK(mFrame, mTxtPackageName.getText(), versionCode);
+				
+			} catch (NumberFormatException ex) {
+				System.err.println("Invalid version code: NaN");
+			}
 		} else if (e.getSource() == mBtnOpenXAPK) {
 			mListener.openXAPK(mFrame);
 		}

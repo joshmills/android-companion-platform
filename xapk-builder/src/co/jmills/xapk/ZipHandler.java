@@ -67,11 +67,13 @@ public class ZipHandler {
 	 * Zip the files in the input directory to a .obb file.
 	 * @param inputFolder
 	 */
-	public static void zip(String inputFolder) {
+	public static void zip(String inputFolder, String packageName, int versionCode) {
 		byte[] buffer = new byte[1024];
-				
+		
+		File inputFile = new File(inputFolder);
+		
 		List<String> fileList = generateFileList(inputFolder, new File(inputFolder));
-		String outputDirectory = inputFolder + ".obb";
+		String outputDirectory = inputFile.getParent() + File.separator + "main." + versionCode + "." + packageName + ".obb";
 		
 		try {
 			
