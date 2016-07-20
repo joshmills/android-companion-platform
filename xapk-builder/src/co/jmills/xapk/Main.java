@@ -27,12 +27,12 @@ public class Main {
 		// Run the GUI
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				
+								
 				// Create the listener for callbacks
 				MainWindowListener listener = new MainWindowListener() {
 					
 					@Override
-					public void openXAPK(JFrame parent) {
+					public void openXAPK(MainWindow context, JFrame parent) {
 						
 						System.out.println("Open XAPK");
 						final JFileChooser fc = new JFileChooser();
@@ -48,7 +48,8 @@ public class Main {
 							System.out.println("Output file: " + outputFilePath + ".");
 							
 							// Unzip the file
-							ZipHandler.unZip(inputFilePath, outputFilePath);
+							XAPKFile loadedFile = ZipHandler.unZip(inputFilePath, outputFilePath);
+							context.setXAPKFile(loadedFile);
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");
@@ -56,7 +57,7 @@ public class Main {
 					}
 
 					@Override
-					public void saveXAPK(JFrame parent, String packageName, int versionCode) {
+					public void saveXAPK(MainWindow context, JFrame parent, String packageName, int versionCode) {
 						
 						System.out.println("Save XAPK");
 						final JFileChooser fc = new JFileChooser();
@@ -80,6 +81,32 @@ public class Main {
 							JOptionPane.showMessageDialog(
 									parent, 
 									completedMessage);
+							
+						} catch (IOException e) {
+							System.err.println("No file chosen.");
+						}
+					}
+
+					@Override
+					public void addToXAPK(MainWindow context, JFrame parent) {
+						
+						System.out.println("Add file to XAPK");
+						final JFileChooser fc = new JFileChooser();
+						
+						try {
+							
+							String inputFilePath = handleFileInput(fc, parent);
+							String outputFilePath = handleFileInput(fc, parent, true);
+							
+							// Log the output
+							System.out.println("Zip file: " + inputFilePath + ".");
+							System.out.println("Output file: " + outputFilePath + ".");
+														
+							XAPKFile loadedFile = ZipHandler.unZip(inputFilePath, outputFilePath);
+							
+							// Increase version code
+							loadedFile.increaseVersionCode();
+							context.setXAPKFile(loadedFile);
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");

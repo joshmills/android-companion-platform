@@ -23,7 +23,7 @@ public class ZipHandler {
 	 * @param inputZipFile
 	 * @param outputFolder
 	 */
-	public static void unZip(String inputZipFile, String outputFolder) {
+	public static XAPKFile unZip(String inputZipFile, String outputFolder) {
 		byte[] buffer = new byte[1024];
 		
 		try {
@@ -60,8 +60,14 @@ public class ZipHandler {
 			
 			System.out.println("Done");
 			
+			XAPKFile loadedFile = new XAPKFile();
+			loadedFile.setPath(inputZipFile);
+			loadedFile.setBytes(new File(inputZipFile).length());
+			return loadedFile;
+			
 		} catch (IOException ex) {
 			System.err.println(ex.getMessage());
+			return null;
 		}
 	}
 	
