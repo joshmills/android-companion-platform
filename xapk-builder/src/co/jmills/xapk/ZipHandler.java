@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import co.jmills.xapk.model.XAPKFile;
+
 /**
  * 
  * @author Josh Mills
@@ -67,7 +69,7 @@ public class ZipHandler {
 	 * Zip the files in the input directory to a .obb file.
 	 * @param inputFolder
 	 */
-	public static void zip(String inputFolder, String packageName, int versionCode) {
+	public static XAPKFile zip(String inputFolder, String packageName, int versionCode) {
 		byte[] buffer = new byte[1024];
 		
 		File inputFile = new File(inputFolder);
@@ -104,8 +106,14 @@ public class ZipHandler {
 			
 			System.out.println("Done");
 			
+			XAPKFile xapkFile = new XAPKFile();
+			xapkFile.setPath(outputDirectory);
+			xapkFile.setBytes(new File(outputDirectory).length());
+			return xapkFile;
+			
 		} catch (IOException ex) {
 			System.err.println(ex.getMessage());
+			return null;
 		}
 	}
 

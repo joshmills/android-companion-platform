@@ -3,12 +3,15 @@ package co.jmills.xapk;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import co.jmills.xapk.gui.MainWindow;
 import co.jmills.xapk.gui.MainWindow.MainWindowListener;
+import co.jmills.xapk.model.XAPKFile;
 
 /**
  * 
@@ -65,7 +68,18 @@ public class Main {
 							System.out.println("Input file: " + inputFilePath + ".");
 							
 							// Handle the xapk compression
-							ZipHandler.zip(inputFilePath, packageName, versionCode);
+							XAPKFile generatedFile = ZipHandler.zip(inputFilePath, packageName, versionCode);
+							
+							// Output the result to the user
+							String completedMessage = String.format(
+									Locale.getDefault(), 
+									Strings.XAPK_SUCCESS_DETAILS, 
+									generatedFile.getPath(), 
+									generatedFile.getBytes());
+							System.out.println(completedMessage);
+							JOptionPane.showMessageDialog(
+									parent, 
+									completedMessage);
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");
