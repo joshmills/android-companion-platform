@@ -146,4 +146,19 @@ public class ZipHandler {
 	private static String generateZipEntry(String sourceFolder, String file) {
 		return file.substring(sourceFolder.length() + 1, file.length());
 	}
+
+	public static XAPKFile load(String inputFilePath) {
+		
+		File directory = new File(inputFilePath);
+		
+		if (directory.isDirectory()) {
+			XAPKFile xapkFile = new XAPKFile();
+			xapkFile.setPath(inputFilePath);
+			xapkFile.setBytes(0);
+			return xapkFile;
+		}
+		
+		System.err.println("File selected is not a directory.");
+		return null;
+	}
 }

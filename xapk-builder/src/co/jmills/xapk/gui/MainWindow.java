@@ -1,20 +1,18 @@
 package co.jmills.xapk.gui;
 
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import co.jmills.xapk.Strings;
 import co.jmills.xapk.model.XAPKFile;
-
-import javax.swing.JButton;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import javax.swing.BoxLayout;
-import javax.swing.JTextField;
-import javax.swing.JPanel;
-import java.awt.Component;
-import java.awt.FlowLayout;
 
 /**
  * 
@@ -24,6 +22,7 @@ public class MainWindow implements ActionListener {
 
 	// Views
 	private JFrame mFrame;
+	private JButton mBtnExtractXAPK;
 	private JButton mBtnOpenXAPK;
 	private JButton mBtnSaveXAPK;
 	private JButton mBtnAddFile;
@@ -35,6 +34,7 @@ public class MainWindow implements ActionListener {
 	// Callbacks
 	private MainWindowListener mListener;
 	public interface MainWindowListener {
+		void extractXAPK(MainWindow context, JFrame parent);
 		void openXAPK(MainWindow context, JFrame parent);
 		void saveXAPK(MainWindow context, JFrame parent, String packageName, int versionCode);
 		void addToXAPK(MainWindow context, JFrame parent);
@@ -66,6 +66,10 @@ public class MainWindow implements ActionListener {
 		mBtnOpenXAPK = new JButton(Strings.WINDOW_OPEN_XAPK_BUTTON);
 		mFrame.getContentPane().add(mBtnOpenXAPK);
 		mBtnOpenXAPK.addActionListener(this);
+		
+		mBtnExtractXAPK = new JButton(Strings.WINDOW_EXTRACT_XAPK_BUTTON);
+		mFrame.getContentPane().add(mBtnExtractXAPK);
+		mBtnExtractXAPK.addActionListener(this);
 		
 		mBtnSaveXAPK = new JButton("Save XAPK");
 		mFrame.getContentPane().add(mBtnSaveXAPK);
@@ -106,10 +110,12 @@ public class MainWindow implements ActionListener {
 			} catch (NumberFormatException ex) {
 				System.err.println("Invalid version code: NaN");
 			}
-		} else if (e.getSource() == mBtnOpenXAPK) {
-			mListener.openXAPK(MainWindow.this, mFrame);
+		} else if (e.getSource() == mBtnExtractXAPK) {
+			mListener.extractXAPK(MainWindow.this, mFrame);
 		} else if (e.getSource() == mBtnAddFile) {
 			mListener.addToXAPK(MainWindow.this, mFrame);
+		} else if (e.getSource() == mBtnOpenXAPK) {
+			mListener.openXAPK(MainWindow.this, mFrame);
 		}
 	}
 

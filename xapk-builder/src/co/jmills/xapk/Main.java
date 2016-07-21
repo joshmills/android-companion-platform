@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import co.jmills.xapk.gui.MainWindow;
 import co.jmills.xapk.gui.MainWindow.MainWindowListener;
+import co.jmills.xapk.gui.XAPKViewer;
 import co.jmills.xapk.model.XAPKFile;
 
 /**
@@ -18,7 +19,7 @@ import co.jmills.xapk.model.XAPKFile;
  * @author Josh Mills
  */
 public class Main {
-
+	
 	/**
 	 * The starting point for the application.
 	 */
@@ -32,9 +33,9 @@ public class Main {
 				MainWindowListener listener = new MainWindowListener() {
 					
 					@Override
-					public void openXAPK(MainWindow context, JFrame parent) {
+					public void extractXAPK(MainWindow context, JFrame parent) {
 						
-						System.out.println("Open XAPK");
+						System.out.println("Extract XAPK");
 						final JFileChooser fc = new JFileChooser();
 						
 						try {
@@ -50,6 +51,9 @@ public class Main {
 							// Unzip the file
 							XAPKFile loadedFile = ZipHandler.unZip(inputFilePath, outputFilePath);
 							context.setXAPKFile(loadedFile);
+							
+							XAPKViewer xapkViewer = new XAPKViewer(loadedFile);
+							xapkViewer.show();
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");
@@ -110,6 +114,26 @@ public class Main {
 							
 						} catch (IOException e) {
 							System.err.println("No file chosen.");
+						}
+					}
+
+					@Override
+					public void openXAPK(MainWindow context, JFrame parent) {
+						
+						System.out.println("Open XAPK");
+						final JFileChooser fc = new JFileChooser();
+						
+						try {
+							String inputFilePath = handleFileInput(fc, parent, true);
+							
+							System.out.println("xapk folder : " + inputFilePath + ".");
+							
+							XAPKFile loadedFile = ZipHandler.load(inputFilePath);
+							XAPKViewer xapkViewer = new XAPKViewer(loadedFile);
+							xapkViewer.show();
+							
+						} catch (IOException ex) {
+							System.err.println("No file chosen");
 						}
 					}
 				};
