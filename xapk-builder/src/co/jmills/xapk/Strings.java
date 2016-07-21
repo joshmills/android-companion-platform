@@ -11,4 +11,5 @@ public class Strings {
 	public static final String WINDOW_ADD_FILE = "Add File to XAPK";
 	public static final String WINDOW_OPEN_XAPK_BUTTON = "Open XAPK";
 	public static final String WINDOW_RETRY = "Refresh";
+	public static final String WINDOW_SEARCH = "Search";
 }
