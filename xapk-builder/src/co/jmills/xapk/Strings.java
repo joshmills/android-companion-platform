@@ -13,4 +13,5 @@ public class Strings {
 	public static final String WINDOW_RETRY = "Refresh";
 	public static final String WINDOW_SEARCH = "Search";
 	public static final String XAPK_POPUP_DELETE = "Delete";
+	public static final String XAPK_POPUP_SIZE = "Size";
 }

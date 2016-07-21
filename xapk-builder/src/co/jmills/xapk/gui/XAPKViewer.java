@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import co.jmills.xapk.Strings;
 import co.jmills.xapk.model.XAPKFile;
@@ -82,7 +83,7 @@ public class XAPKViewer implements ActionListener {
 	}
 	
 	private DefaultMutableTreeNode parseFiles(FilenameFilter filenameFilter) {
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(this.mXapkFile.getPackageName());
+		DefaultMutableTreeNode top = new DefaultMutableTreeNode(this.mXapkFile.getPath());
 		
 		File topFile = new File(this.mXapkFile.getPath());
 		if (topFile.isDirectory()) {
@@ -166,9 +167,21 @@ public class XAPKViewer implements ActionListener {
 					// Show the context menu for the closest row
 					PopUpMenu menu = new PopUpMenu(new PopUpMenuListener() {
 						public void delete() {
-							System.out.println("Delete file : " + mTree.getPathForRow(row).getLastPathComponent());
+							String fileName = mTree.getPathForRow(row).getLastPathComponent().toString();
+							System.out.println("Delete file : " + fileName);
 							DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
 							model.removeNodeFromParent((MutableTreeNode) mTree.getPathForRow(row).getLastPathComponent());
+						}
+
+						@Override
+						public void showSizeInfo() {
+							File selectedFile = getFileFromTreePath(mTree.getPathForRow(row));
+							
+							String sizeString = "Size : " + selectedFile.length() + "b";
+							System.out.println(sizeString);
+							JOptionPane.showMessageDialog(
+									mFrame, 
+									sizeString);
 						};
 					});
 					menu.show(mTree, e.getX(), e.getY());		
@@ -180,6 +193,14 @@ public class XAPKViewer implements ActionListener {
 		mFrame.invalidate();
 		mFrame.validate();
 		expandAll(mTree);
+	}
+	
+	private File getFileFromTreePath(TreePath treePath) {
+		String path = "";
+		for (Object node : treePath.getPath()) {
+			path += ((MutableTreeNode) node).toString() + File.separator;
+		}
+		return new File(path);
 	}
 	
 	private void refresh() {		
@@ -225,14 +246,21 @@ public class XAPKViewer implements ActionListener {
 	@SuppressWarnings("serial")
 	class PopUpMenu extends JPopupMenu implements ActionListener {
 		
+		private JMenuItem mSizeInfoItem;
 		private JMenuItem mDeleteItem;
 		private PopUpMenuListener mListener;
 		
 		public PopUpMenu(PopUpMenuListener listener) {
 			mListener = listener;
+			
 			mDeleteItem = new JMenuItem(Strings.XAPK_POPUP_DELETE);
 			mDeleteItem.addActionListener(this);
+			
+			mSizeInfoItem = new JMenuItem(Strings.XAPK_POPUP_SIZE);
+			mSizeInfoItem.addActionListener(this);
+			
 			add(mDeleteItem);
+			add(mSizeInfoItem);
 		}
 
 		@Override
@@ -240,10 +268,15 @@ public class XAPKViewer implements ActionListener {
 			if (e.getSource() == mDeleteItem) {
 				mListener.delete();
 			}
+			
+			else if (e.getSource() == mSizeInfoItem) {
+				mListener.showSizeInfo();
+			}
 		}
 	}
 	
 	public interface PopUpMenuListener {
 		void delete();
+		void showSizeInfo();
 	}
 }
