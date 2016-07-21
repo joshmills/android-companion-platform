@@ -1,23 +1,29 @@
 package co.jmills.xapk.gui;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FilenameFilter;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import co.jmills.xapk.Strings;
 import co.jmills.xapk.model.XAPKFile;
-
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FilenameFilter;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
 
 /**
  * 
@@ -100,7 +106,7 @@ public class XAPKViewer implements ActionListener {
 				MutableTreeNode innerNode = parseInnerFiles(innerFile, filenameFilter);
 				if (innerNode != null) {
 					if (innerFile.isDirectory() && innerNode.getChildCount() > 0 || innerFile.isFile()){
-						node.add(innerNode);	
+						node.add(innerNode);
 					}
 				}
 			}
@@ -144,6 +150,32 @@ public class XAPKViewer implements ActionListener {
 				}
 			}
 		}));
+		
+		mTree.setEditable(true);
+		
+		// Add support for right clicking on the tree of files
+		MouseListener mouseListener = new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					
+					final int row = mTree.getClosestRowForLocation(e.getX(), e.getY());
+					mTree.setSelectionRow(row);
+					
+					// Show the context menu for the closest row
+					PopUpMenu menu = new PopUpMenu(new PopUpMenuListener() {
+						public void delete() {
+							System.out.println("Delete file : " + mTree.getPathForRow(row).getLastPathComponent());
+							DefaultTreeModel model = (DefaultTreeModel) mTree.getModel();
+							model.removeNodeFromParent((MutableTreeNode) mTree.getPathForRow(row).getLastPathComponent());
+						};
+					});
+					menu.show(mTree, e.getX(), e.getY());		
+				}
+			}
+		};
+		mTree.addMouseListener(mouseListener);	
 		mFrame.getContentPane().add(mTree, BorderLayout.CENTER);
 		mFrame.invalidate();
 		mFrame.validate();
@@ -187,6 +219,31 @@ public class XAPKViewer implements ActionListener {
 			tree.expandRow(i);
 			i++;
 			j = tree.getRowCount();
+		}	
+	}
+	
+	@SuppressWarnings("serial")
+	class PopUpMenu extends JPopupMenu implements ActionListener {
+		
+		private JMenuItem mDeleteItem;
+		private PopUpMenuListener mListener;
+		
+		public PopUpMenu(PopUpMenuListener listener) {
+			mListener = listener;
+			mDeleteItem = new JMenuItem(Strings.XAPK_POPUP_DELETE);
+			mDeleteItem.addActionListener(this);
+			add(mDeleteItem);
 		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == mDeleteItem) {
+				mListener.delete();
+			}
+		}
+	}
+	
+	public interface PopUpMenuListener {
+		void delete();
 	}
 }
